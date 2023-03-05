@@ -1,0 +1,25 @@
+---
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15.2-alpine
+    restart: always
+    ports:
+      - "127.0.0.1:${DB_FORWARD_PORT:-5432}:5432"
+    volumes:
+      - "webshop:/var/lib/postgresql/data:cached"
+    networks:
+      - webshop
+    environment:
+      POSTGRES_USER: "${DB_USERNAME}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      POSTGRES_DB: "${DB_DATABASE}"
+
+networks:
+  webshop:
+    driver: bridge
+
+volumes:
+  webshop:
+    driver: local
