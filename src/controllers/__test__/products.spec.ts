@@ -11,8 +11,13 @@ describe('Products Controller', () => {
     expect(response.status).toBe(HttpStatusCode.OK);
     expect(response.body).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ name: 'Book', price: 14 }),
-        expect.objectContaining({ name: 'Phone', price: 299.99 }),
+        expect.objectContaining({
+          name: 'Book',
+          price: 14,
+          inStock: true,
+          images: expect.arrayContaining(['image_url']),
+        }),
+        expect.objectContaining({ name: 'Phone', price: 299.99, inStock: false, images: [] }),
       ]),
     );
   });

@@ -23,7 +23,8 @@ export async function up(knex: Knex): Promise<void> {
         .uuid('product_id')
         .index()
         .references('product_id')
-        .inTable('products');
+        .inTable('products')
+        .onDelete('cascade');
       table.text('image_url').notNullable();
       table.timestamps();
     });
