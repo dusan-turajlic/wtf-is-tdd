@@ -1,4 +1,4 @@
-import app, { connection } from '../index';
+import { connection, app } from '../server';
 
 jest.mock('http', () => ({
   createServer: jest.fn().mockImplementation(() => ({ listen: jest.fn() })),
