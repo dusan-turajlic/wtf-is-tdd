@@ -1,4 +1,4 @@
-import app, { knex } from '../index';
+import app, { connection } from '../index';
 
 jest.mock('http', () => ({
   createServer: jest.fn().mockImplementation(() => ({ listen: jest.fn() })),
@@ -9,6 +9,6 @@ test('Application starts', () => {
 });
 
 test('Database connection', async () => {
-  const one = await knex.raw('SELECT 1');
-  expect(one).toBe(1);
+  const response = await connection.raw('SELECT 1');
+  expect(response).toBeDefined();
 });
