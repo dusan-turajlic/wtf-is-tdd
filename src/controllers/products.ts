@@ -1,14 +1,20 @@
+import bodyParser from 'koa-bodyparser';
 import Router from 'koa-router';
 import HttpStatusCode from '../enum/http';
-import ProductService from '../services/Product';
+import ProductService, { CreateProductParams } from '../services/Product';
 
 const register = (router: Router) => {
-  router.get('/products', async ctx => {
-    ctx.status = HttpStatusCode.OK;
-    const products = await ProductService.getAll();
+  router
+    .get('/products', async ctx => {
+      const products = await ProductService.getAll();
 
-    ctx.body = products;
-  });
+      ctx.status = HttpStatusCode.OK;
+      ctx.body = products;
+    })
+    .post('/products', bodyParser(), async ctx => {
+      ctx.body = await ProductService.createOne(ctx.request.body as CreateProductParams);
+      ctx.status = HttpStatusCode.CREATED;
+    });
 };
 
 export default { register };

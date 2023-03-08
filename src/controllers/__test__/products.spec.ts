@@ -1,6 +1,6 @@
 import request from 'supertest';
 import HttpStatusCode from '../../enum/http';
-import * as ProductService from '../../services/Product';
+import ProductService from '../../services/Product';
 import { app } from '../../server';
 
 describe('Products Controller', () => {
@@ -34,7 +34,7 @@ describe('Products Controller', () => {
       .post('/products')
       .send(payload);
 
-    expect(resposnse.status).toBe(HttpStatusCode.OK);
-    expect(ProductService.getOne(resposnse.body.productId)).toBeDefined();
+    expect(resposnse.status).toBe(HttpStatusCode.CREATED);
+    expect(await ProductService.getOne(resposnse.body.productId)).toBeDefined();
   });
 });
