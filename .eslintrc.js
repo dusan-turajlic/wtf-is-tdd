@@ -6,6 +6,6 @@ module.exports = {
   rules: {
     'import/prefer-default-export': 'off',
     // Database uses snake case so its anoying to set disable this per line
-    'camelcase': 'off',
+    '@typescript-eslint/camelcase': 'off',
   },
 };

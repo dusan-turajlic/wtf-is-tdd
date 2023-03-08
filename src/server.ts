@@ -1,7 +1,10 @@
 import Koa from 'koa';
+import bodyParser from 'koa-bodyparser';
 import { router } from './router';
 
 export const app = new Koa();
 
-// Apply routes
-app.use(router.routes());
+app
+  .use(router.routes())
+  .use(router.allowedMethods())
+  .use(bodyParser());
