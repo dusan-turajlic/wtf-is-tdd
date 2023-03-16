@@ -11,6 +11,6 @@
     "outDir": "dist",
     "baseUrl": "."
   },
-  "include": ["src/**/*", "migrations/**/*", "seeds/**/*", "jest.config.js", "kenxfile.ts"],
+  "include": ["src/**/*", "migrations/**/*", "seeds/**/*", "jest.config.js", "*.ts"],
   "exclude": ["node_modules", "dist"]
 }

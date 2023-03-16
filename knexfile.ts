@@ -21,8 +21,14 @@ const config: { [key: string]: Knex.Config } = {
     migrations: {
       tableName: 'migrations'
     }
-  }
-
+  },
 };
 
-module.exports = config;
+export const onUpdateTrigger = (table: string) => `
+  CREATE TRIGGER ${table}_updated_at
+  BEFORE UPDATE ON ${table}
+  FOR EACH ROW
+  EXECUTE PROCEDURE on_update_timestamp();
+`;
+
+export default config;
