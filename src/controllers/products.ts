@@ -14,6 +14,11 @@ const register = (router: Router) => {
     .get('/products/:productId', async ctx => {
       const product = await ProductService.getOne(ctx.params.productId);
 
+      if (!product) {
+        ctx.status = HttpStatusCode.NOT_FOUND;
+        return;
+      }
+
       ctx.status = HttpStatusCode.OK;
       ctx.body = product;
     })
@@ -23,6 +28,11 @@ const register = (router: Router) => {
     })
     .patch('/products/:productId', bodyParser(), async ctx => {
       ctx.body = await ProductService.updateOne(ctx.params.productId, ctx.request.body as Partial<CreateProductParams>);
+      ctx.status = HttpStatusCode.OK;
+    })
+    .delete('/products/:productId', async ctx => {
+      await ProductService.deleteOne(ctx.params.productId);
+
       ctx.status = HttpStatusCode.OK;
     });
 };

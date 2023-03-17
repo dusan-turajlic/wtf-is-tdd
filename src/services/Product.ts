@@ -33,9 +33,15 @@ export default new (class ProductService {
   }
 
   async getOne(productId: string) {
-    const [product] = await this.getProductsQuery<ProductQueary[]>()
+    const products = await this.getProductsQuery<ProductQueary[]>()
       .where('products.product_id', productId)
       .limit(1);
+
+    if (!products.length) {
+      return null;
+    }
+
+    const [product] = products;
     return ProductService.parseProduct(product);
   }
 
@@ -60,26 +66,35 @@ export default new (class ProductService {
     });
   }
 
-  updateOne(productId: string, { name, price, amount, images }: Partial<CreateProductParams>) {
+  async updateOne(productId: string, { name, price, amount, images }: Partial<CreateProductParams>) {
+    await this.db.transaction(async transaction => {
+      if (name || price || amount) {
+        await transaction('products')
+          .where('product_id', productId)
+          .update(
+            {
+              name,
+              price: price && price * 100,
+              amount,
+            },
+            ['name', 'price', 'amount'],
+          );
+      }
+
+      if (images && images.length) {
+        await ProductService.addNewImages(transaction, productId, images);
+      }
+    });
+
+    return this.getOne(productId);
+  }
+
+  async deleteOne(productId: string) {
     return this.db.transaction(async transaction => {
-      const [product] = await transaction('products')
+      // Product images are deleted by cascade.
+      await transaction('products')
         .where('product_id', productId)
-        .update(
-          {
-            name,
-            price: price && price * 100,
-            amount,
-          },
-          ['name', 'price', 'amount'],
-        );
-
-      const productImages = await ProductService.addNewImages(transaction, product.productId, images);
-
-      return ProductService.parseProduct({
-        product_id: productId,
-        ...product,
-        images: productImages,
-      });
+        .del();
     });
   }
 
