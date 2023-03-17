@@ -25,19 +25,40 @@ describe('Products Controller', () => {
     );
   });
 
-  it('create product', async () => {
-    const payload = {
+  describe('create product', () => {
+    const productPayload = {
       name: 'Pot',
       price: 29.99,
       amount: 4,
       images: ['https://i.imgur.com/oXRmvsF.jpeg'],
     };
-    const response = await request(app.callback())
-      .post('/products')
-      .send(payload);
 
-    expect(response.status).toBe(HttpStatusCode.CREATED);
-    expect(await ProductService.getOne(response.body.productId)).toBeDefined();
+    it.each([[{ ...productPayload }], [{ ...productPayload, images: [] }]])('can create a product', async payload => {
+      const response = await request(app.callback())
+        .post('/products')
+        .send(payload);
+
+      expect(response.status).toBe(HttpStatusCode.CREATED);
+      expect(await ProductService.getOne(response.body.productId)).toBeDefined();
+    });
+
+    it.each([
+      [{ ...productPayload, milieusValue: 'DELETE FROM products' }],
+      [{ name: productPayload.name }],
+      [{ price: productPayload.price }],
+      [{ amount: productPayload.amount }],
+      [{ images: productPayload.images }],
+      [{ name: -1 }],
+      [{ price: -999 }],
+      [{ amount: -10 }],
+      [{ images: null }],
+    ])('throws when odd values are given', async payload => {
+      const response = await request(app.callback())
+        .post('/products')
+        .send(payload);
+
+      expect(response.status).toBe(HttpStatusCode.BAD_REQUEST);
+    });
   });
 
   describe('product updates', () => {
