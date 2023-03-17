@@ -4,7 +4,7 @@ import { Product } from '../representations';
 import { ProductTable } from '../scheme';
 
 interface ProductQueary extends Omit<ProductTable, 'created_at' | 'updated_at'> {
-  images: string[];
+  images?: string[];
 }
 
 export type CreateProductParams = Omit<ProductQueary, 'product_id'>;
@@ -28,45 +28,92 @@ export default new (class ProductService {
   }
 
   async getAll() {
-    const allProducts = await this.getProductsQuary();
+    const allProducts = await this.getProductsQuery();
     return allProducts.map(ProductService.parseProduct);
   }
 
   async getOne(productId: string) {
-    const [product] = await this.getProductsQuary<ProductQueary[]>()
+    const products = await this.getProductsQuery<ProductQueary[]>()
       .where('products.product_id', productId)
       .limit(1);
+
+    if (!products.length) {
+      return null;
+    }
+
+    const [product] = products;
     return ProductService.parseProduct(product);
   }
 
   async createOne({ name, price, amount, images }: CreateProductParams) {
-    const productId = await this.db.transaction(async transaction => {
-      const [{ product_id }] = await transaction('products').insert(
+    return this.db.transaction(async transaction => {
+      const [product] = await transaction('products').insert(
         {
           name,
           // Price is stored in cents
           price: price * 100,
           amount,
         },
-        'product_id',
+        ['product_id', 'name', 'price', 'amount'],
       );
 
-      await Promise.all(
-        images.map(async imageUrl => {
-          await transaction('product_images').insert({
-            product_id,
-            image_url: imageUrl,
-          });
-        }),
-      );
+      const productImages = await ProductService.addNewImages(transaction, product.productId, images);
 
-      return product_id;
+      return ProductService.parseProduct({
+        ...product,
+        images: productImages,
+      });
+    });
+  }
+
+  async updateOne(productId: string, { name, price, amount, images }: Partial<CreateProductParams>) {
+    await this.db.transaction(async transaction => {
+      if (name || price || amount) {
+        await transaction('products')
+          .where('product_id', productId)
+          .update(
+            {
+              name,
+              price: price && price * 100,
+              amount,
+            },
+            ['name', 'price', 'amount'],
+          );
+      }
+
+      if (images && images.length) {
+        await ProductService.addNewImages(transaction, productId, images);
+      }
     });
 
     return this.getOne(productId);
   }
 
-  private getProductsQuary<T = ProductQueary[]>() {
+  async deleteOne(productId: string) {
+    return this.db.transaction(async transaction => {
+      // Product images are deleted by cascade.
+      await transaction('products')
+        .where('product_id', productId)
+        .del();
+    });
+  }
+
+  private static async addNewImages(transaction: Knex.Transaction, productId: string, images: string[] = []) {
+    return Promise.all(
+      images.map(async imageUrl => {
+        const [image] = await transaction('product_images').insert(
+          {
+            product_id: productId,
+            image_url: imageUrl,
+          },
+          ['image_url'],
+        );
+        return image.image_url;
+      }),
+    );
+  }
+
+  private getProductsQuery<T = ProductQueary[]>() {
     return this.db('products')
       .leftJoin('product_images', 'product_images.product_id', 'products.product_id')
       .select<T>(this.defaultQuary)

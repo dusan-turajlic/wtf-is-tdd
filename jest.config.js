@@ -8,4 +8,5 @@ module.exports = {
   },
   testMatch: ['**/src/**/__test__/**/*.spec.(ts|js)'],
   testEnvironment: 'node',
+  silent: false,
 };
