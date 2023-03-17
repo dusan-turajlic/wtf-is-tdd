@@ -1,7 +1,5 @@
 import dotenv from 'dotenv';
 
-const { name, version } = require('../package.json');
-
 dotenv.config();
 
 const {
@@ -18,14 +16,13 @@ const {
 } = process.env;
 
 export const appConfig = {
-  env: NODE_ENV || 'development',
-  name: APP_NAME || name,
-  version,
-  host: APP_HOST || '0.0.0.0',
-  port: APP_PORT || 7070,
+  env: NODE_ENV,
+  name: APP_NAME,
+  host: APP_HOST,
+  port: APP_PORT,
 
   dbHost: DB_HOST,
-  dbPort: parseInt(DB_FORWARD_PORT ?? '0', 10) || 5432,
+  dbPort: parseInt(DB_FORWARD_PORT as string, 10),
   dbName: DB_DATABASE,
   dbPassword: DB_PASSWORD,
   dbUsername: DB_USERNAME,
