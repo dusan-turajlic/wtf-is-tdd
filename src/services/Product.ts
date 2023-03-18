@@ -1,13 +1,13 @@
 import { Knex } from 'knex';
+import { z } from 'zod';
 import { connection } from '../db';
 import { Product } from '../representations';
+import { CreateProduct, UpdateProduct } from '../validators';
 import { ProductTable } from '../scheme';
 
 interface ProductQueary extends Omit<ProductTable, 'created_at' | 'updated_at'> {
   images?: string[];
 }
-
-export type CreateProductParams = Omit<ProductQueary, 'product_id'>;
 
 export default new (class ProductService {
   db: Knex;
@@ -45,7 +45,7 @@ export default new (class ProductService {
     return ProductService.parseProduct(product);
   }
 
-  async createOne({ name, price, amount, images }: CreateProductParams) {
+  async createOne({ name, price, amount, images }: z.infer<typeof CreateProduct>) {
     return this.db.transaction(async transaction => {
       const [product] = await transaction('products').insert(
         {
@@ -66,7 +66,7 @@ export default new (class ProductService {
     });
   }
 
-  async updateOne(productId: string, { name, price, amount, images }: Partial<CreateProductParams>) {
+  async updateOne(productId: string, { name, price, amount, images }: z.infer<typeof UpdateProduct>) {
     await this.db.transaction(async transaction => {
       if (name || price || amount) {
         await transaction('products')
