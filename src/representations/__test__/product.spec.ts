@@ -8,6 +8,7 @@ describe('Product', () => {
     price: 2999,
     images: ['https://i.imgur.com/oXRmvsF.jpeg'],
   };
+
   it('Does not throw when parsing', () => {
     expect(() => {
       Product.parse({
