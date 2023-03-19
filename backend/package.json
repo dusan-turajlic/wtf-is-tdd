@@ -8,7 +8,7 @@
   "files": [
     "dist/*"
   ],
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "scripts": {
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run ts:watch\" \"npm run start:watch\"",
     "watch:debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run ts:watch\" \"npm run start:debug\"",
@@ -33,6 +33,7 @@
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^8.0.8",
+    "koa2-cors": "^2.0.6",
     "pg": "^8.9.0",
     "zod": "^3.21.0"
   },

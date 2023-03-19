@@ -1,9 +1,11 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import './index.css';
+import { ProductView } from './views/product';
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+const root = document.getElementById('root') as HTMLElement;
+createRoot(root).render(
   <React.StrictMode>
-    <h1>Hello World</h1>
+    <ProductView />
   </React.StrictMode>,
 );
