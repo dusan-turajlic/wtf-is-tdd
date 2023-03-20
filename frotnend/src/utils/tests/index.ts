@@ -20,3 +20,10 @@ export const mockAllProductEndpoint = (...mockProducts: Product[]) => {
     json: vi.fn().mockResolvedValue(mockProducts),
   } as unknown as Response);
 };
+
+export const flushPromises = () =>
+  new Promise((r) => {
+    r(null);
+  });
+
+export const flushTimers = () => new Promise((r) => setTimeout(r, 0));

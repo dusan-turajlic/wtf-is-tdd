@@ -31,6 +31,7 @@
     "@typescript-eslint/eslint-plugin": "^5.26.0",
     "@typescript-eslint/parser": "^5.26.0",
     "@vitejs/plugin-react-swc": "^3.0.0",
+    "@vitest/coverage-c8": "^0.29.3",
     "autoprefixer": "^10.4.14",
     "eslint": "^8.16.0",
     "eslint-config-prettier": "^8.5.0",

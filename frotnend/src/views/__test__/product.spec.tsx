@@ -41,6 +41,12 @@ describe('Product', () => {
       amount: 2,
       images: ['https://picsum.photos/200/300'],
     }),
+    createProduct({
+      name: 'Product nr 7',
+      price: 79.99,
+      amount: 2,
+      images: null,
+    }),
   ];
   beforeAll(() => {
     mockAllProductEndpoint(...mockProducts);
@@ -49,11 +55,15 @@ describe('Product', () => {
 
   it.each(mockProducts.map((prod) => [prod]))(
     'can render products page with all products',
-    async ({ productId, name, price }) => {
+    async ({ productId, name, price, images }) => {
       const listItem = await screen.findByTestId(productId);
       const parentElement = within(listItem);
       parentElement.getByRole('heading', { name });
       parentElement.getByText(`${price}€`);
+
+      const image = parentElement.getByRole<HTMLImageElement>('img');
+      const expectedImageSrc = images?.[0] ?? '';
+      expect(image.src).toBe(expectedImageSrc);
     },
   );
 });
