@@ -14,7 +14,7 @@ export const ProductView = () => {
           title={'Products'}
           render={(response) => {
             return response.map((product) => {
-              const [image = ''] = product.images ?? [];
+              const [image] = product.images ?? [];
               return (
                 <Card
                   key={product.productId}

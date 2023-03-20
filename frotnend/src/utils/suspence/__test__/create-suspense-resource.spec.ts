@@ -1,10 +1,7 @@
 import { createSuspenseResource } from '../create-suspense-resource';
 import { describe, expect, it } from 'vitest';
+import { flushPromises, flushTimers } from '../../tests';
 
-const flushPromises = () =>
-  new Promise((r) => {
-    r(null);
-  });
 describe('createSuspenseResource', () => {
   it('will resolved data', async () => {
     const resolvedData = 'resolved data';
@@ -25,7 +22,7 @@ describe('createSuspenseResource', () => {
     });
 
     const result = createSuspenseResource<string>(promise);
-    await flushPromises();
+    await flushTimers();
     try {
       result.read();
     } catch (error) {
