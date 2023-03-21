@@ -1,8 +1,8 @@
-import { CardStripe } from '../components/card-stripe';
+import { CardStripe } from '../../components/card-stripe';
 import { Suspense } from 'react';
-import { getAllProducts } from '../services/products';
-import { Card } from '../components/card';
-import { createSuspenseResource } from '../utils/suspence/create-suspense-resource';
+import { getAllProducts } from '../../services/products';
+import { Card } from '../../components/card';
+import { createSuspenseResource } from '../../utils/suspence/create-suspense-resource';
 
 export const ProductView = () => {
   const productResource = createSuspenseResource(getAllProducts());

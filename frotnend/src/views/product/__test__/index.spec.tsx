@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { ProductView } from '../product';
+import { ProductView } from '../product/product';
 import { render, screen, within } from '@testing-library/react';
-import { createProduct, mockAllProductEndpoint } from '../../utils/tests';
+import { createProduct, mockAllProductEndpoint } from '../../../utils/tests';
 
 describe('Product', () => {
   const mockProducts = [

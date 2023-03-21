@@ -1,1 +1,5 @@
 .idea
+backend/.minio/data/.minio.sys/buckets/.bloomcycle.bin/xl.meta
+backend/.minio/data/.minio.sys/buckets/.usage-cache.bin/xl.meta
+backend/.minio/data/.minio.sys/buckets/.usage.json/xl.meta
+backend/.minio/data/.minio.sys/buckets/webshop-bucket/.usage-cache.bin/xl.meta
