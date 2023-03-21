@@ -1,7 +1,6 @@
 import { Knex } from 'knex';
 import * as crypto from 'crypto';
 import { z } from 'zod';
-import * as process from 'process';
 import { connection } from '../db';
 import { Product } from '../representations';
 import { CreateProduct, UpdateProduct } from '../validators';
@@ -49,9 +48,9 @@ export default new (class ProductService {
     return ProductService.parseProduct(product);
   }
 
-  async createOne({ name, price, description, amount, images }: z.infer<typeof CreateProduct>) {
-    return this.db.transaction(async transaction => {
-      const [product] = await transaction('products').insert(
+  async createOne({ name, price, description, amount }: z.infer<typeof CreateProduct>) {
+    const product = await this.db.transaction(async transaction => {
+      const [productData] = await transaction('products').insert(
         {
           name,
           // Price is stored in cents
@@ -61,17 +60,13 @@ export default new (class ProductService {
         },
         ['product_id', 'name', 'description', 'price', 'amount'],
       );
-
-      const productImages = await ProductService.addNewImages(transaction, product.productId, images);
-
-      return ProductService.parseProduct({
-        ...product,
-        images: productImages,
-      });
+      return productData;
     });
+
+    return ProductService.parseProduct({ ...product });
   }
 
-  async updateOne(productId: string, { name, price, description, amount, images }: z.infer<typeof UpdateProduct>) {
+  async updateOne(productId: string, { name, price, description, amount }: z.infer<typeof UpdateProduct>) {
     await this.db.transaction(async transaction => {
       if (name || price || amount || description) {
         await transaction('products')
@@ -86,10 +81,6 @@ export default new (class ProductService {
             ['name', 'price', 'description', 'amount'],
           );
       }
-
-      if (images && images.length) {
-        await ProductService.addNewImages(transaction, productId, images);
-      }
     });
 
     return this.getOne(productId);
@@ -102,26 +93,6 @@ export default new (class ProductService {
         .where('product_id', productId)
         .del();
     });
-  }
-
-  private static async addNewImages(transaction: Knex.Transaction, productId: string, images: Blob[] = []) {
-    const uploadedImages = await Promise.all(
-      images.map(async blob => {
-        return uploadToS3(blob, productId, crypto.randomUUID());
-      }),
-    );
-    return Promise.all(
-      uploadedImages.map(async imageUrl => {
-        const [image] = await transaction('product_images').insert(
-          {
-            product_id: productId,
-            image_url: imageUrl,
-          },
-          ['image_url'],
-        );
-        return image.image_url;
-      }),
-    );
   }
 
   private getProductsQuery<T = ProductQueary[]>() {
