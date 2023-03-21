@@ -1,17 +1,27 @@
 import request from 'supertest';
 import { z } from 'zod';
-import * as fs from 'fs';
-import * as path from 'path';
 import HttpStatusCode from '../../enum/http';
 import ProductService from '../../services/Product';
 import { app } from '../../server';
 import { Product } from '../../representations';
 import { UpdateProduct } from '../../validators';
 
-const file = fs.readFileSync(path.resolve('src/controllers/__test__/images/pot.jpeg'));
-
 describe('Products Controller', () => {
   it('get all products', async () => {
+    const bookProduct = await ProductService.createOne({
+      name: 'Book',
+      amount: 10,
+      description: 'A book',
+      price: 14,
+    });
+
+    const phoneProduct = await ProductService.createOne({
+      name: 'Phone',
+      amount: 0,
+      description: 'A phone',
+      price: 299.99,
+    });
+
     const response = await request(app.callback())
       .get('/products')
       .set('Accept', 'application/json');
@@ -19,16 +29,13 @@ describe('Products Controller', () => {
     expect(response.status).toBe(HttpStatusCode.OK);
     expect(response.body).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ name: 'Phone', amount: 0, description: 'A phone', price: 299.99, images: [] }),
-        expect.objectContaining({
-          name: 'Book',
-          amount: 10,
-          description: 'A book',
-          price: 14,
-          images: expect.arrayContaining([expect.anything()]),
-        }),
+        expect.objectContaining({ ...phoneProduct }),
+        expect.objectContaining({ ...bookProduct }),
       ]),
     );
+
+    await ProductService.deleteOne(phoneProduct.productId);
+    await ProductService.deleteOne(bookProduct.productId);
   });
 
   describe('create product', () => {
@@ -37,13 +44,12 @@ describe('Products Controller', () => {
       price: 29.99,
       description: 'A pot',
       amount: 4,
-      images: [new Blob([file])],
     };
 
-    it.each([[{ ...productPayload }], [{ ...productPayload, images: [] }]])('can create a product', async payload => {
+    it('can create a product', async () => {
       const response = await request(app.callback())
         .post('/products')
-        .send(payload);
+        .send(productPayload);
 
       expect(response.status).toBe(HttpStatusCode.CREATED);
       expect(await ProductService.getOne(response.body.productId)).toBeDefined();
@@ -54,7 +60,6 @@ describe('Products Controller', () => {
       [{ name: productPayload.name }],
       [{ price: productPayload.price }],
       [{ amount: productPayload.amount }],
-      [{ images: productPayload.images }],
       [{ name: -1 }],
       [{ price: -999 }],
       [{ amount: -10 }],
@@ -88,15 +93,12 @@ describe('Products Controller', () => {
       [{ amount: 3 }],
       [{ price: 50 }],
       [{ description: 'Just a description' }],
-      [{ images: [new Blob([file])] }],
-      [{ images: [] }],
       [
         {
           name: 'All properties',
           amount: 10,
           description: 'Product description',
           price: 999,
-          images: [new Blob([file])],
         },
       ],
     ])('update products with any number of parameters', async (payload: z.infer<typeof UpdateProduct>) => {
@@ -108,12 +110,6 @@ describe('Products Controller', () => {
         .patch(`/products/${initialProduct.productId}`)
         .send(payload);
 
-      if (payload?.images) {
-        // eslint-disable-next-line no-param-reassign
-        payload.images = expect.arrayContaining(
-          payload.images.map(() => expect.stringContaining(`/${updateResponse.body.productId}/`)),
-        );
-      }
       expect(updateResponse.status).toBe(HttpStatusCode.OK);
       expect(updateResponse.body).toEqual(expect.objectContaining({ ...initialProduct, ...payload }));
     });

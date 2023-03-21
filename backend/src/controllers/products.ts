@@ -1,6 +1,5 @@
-import bodyParser from 'koa-bodyparser';
 import Router from 'koa-router';
-import { z } from 'zod';
+import koaBody from 'koa-body';
 import HttpStatusCode from '../enum/http';
 import ProductService from '../services/Product';
 import { CreateProduct, UpdateProduct, validateRequest } from '../validators';
@@ -26,12 +25,12 @@ const register = (router: Router) => {
       ctx.body = product;
     })
 
-    .post('/products', bodyParser(), async ctx => {
+    .post('/products', koaBody(), async ctx => {
       ctx.body = await ProductService.createOne(validateRequest(CreateProduct, ctx));
       ctx.status = HttpStatusCode.CREATED;
     })
 
-    .patch('/products/:productId', bodyParser(), async ctx => {
+    .patch('/products/:productId', koaBody(), async ctx => {
       ctx.body = await ProductService.updateOne(ctx.params.productId, validateRequest(UpdateProduct, ctx));
       ctx.status = HttpStatusCode.OK;
     })
