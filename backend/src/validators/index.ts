@@ -7,7 +7,9 @@ export const CreateProduct = z
     name: z.string(),
     amount: z.number(),
     price: z.number().multipleOf(0.01),
-    images: z.optional(z.array(z.string())),
+    description: z.optional(z.string()),
+    // Zod doesn't support array of blobs
+    images: z.optional(z.array(z.any())),
   })
   .strict();
 

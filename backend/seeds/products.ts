@@ -1,20 +1,14 @@
 import { Knex } from 'knex';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export async function seed(knex: Knex): Promise<void> {
   // Deletes ALL existing entries
   await knex('products').del();
+  const file = fs.readFileSync(path.resolve(`${__dirname}/seed-data.json`));
+  const data = JSON.parse(file.toString());
 
-  // Inserts seed entries
-  const productIds = await knex('products')
-    .returning('product_id')
-    .insert([
-      { name: 'Book', price: 1400, amount: 10 },
-      { name: 'Phone', price: 29999, amount: 0 },
-    ]);
-
-  // eslint-disable-next-line @typescript-eslint/camelcase
-  const [{ product_id }] = (productIds as unknown) as { product_id: string }[];
-  await knex('product_images').insert([
-    { product_id, image_url: 'https://howtodrawforkids.com/wp-content/uploads/2022/07/how-to-draw-an-open-book.jpg' },
-  ]);
+  for await (const [table, values] of Object.entries(data)) {
+    await knex(table).insert(values);
+  }
 }

@@ -22,7 +22,8 @@ export async function up(knex: Knex): Promise<void> {
         .defaultTo(knex.raw('gen_random_uuid()'));
       table.text('name').notNullable();
       // Integer for price because we store price in cents.
-      // Fractional cents are not really possible in product pricing.
+      // Fractional cents are not really possible in product pricing
+      table.text('description').nullable();
       table.integer('price').notNullable();
       table.integer('amount').notNullable();
       table

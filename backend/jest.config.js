@@ -9,5 +9,6 @@ module.exports = {
   testMatch: ['**/src/**/__test__/**/*.spec.(ts|js)'],
   testEnvironment: 'node',
   silent: false,
+  setupFilesAfterEnv: ['./setupTests.ts'],
   coveragePathIgnorePatterns: ['/node_modules/', '/__test__/', '/dist/'],
 };

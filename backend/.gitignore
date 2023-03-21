@@ -16,7 +16,7 @@ tmp
 node_modules
 coverage
 dist
-.env
+../.env
 
 # OS metadata
 .DS_Store
