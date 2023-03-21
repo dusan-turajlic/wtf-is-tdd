@@ -12,7 +12,7 @@ const {
   DB_USERNAME,
   DB_PASSWORD,
   DB_DATABASE,
-  DB_FORWARD_PORT,
+  DB_PORT,
 } = process.env;
 
 export const appConfig = {
@@ -22,7 +22,7 @@ export const appConfig = {
   port: APP_PORT,
 
   dbHost: DB_HOST,
-  dbPort: parseInt(DB_FORWARD_PORT as string, 10),
+  dbPort: parseInt(DB_PORT!, 10),
   dbName: DB_DATABASE,
   dbPassword: DB_PASSWORD,
   dbUsername: DB_USERNAME,

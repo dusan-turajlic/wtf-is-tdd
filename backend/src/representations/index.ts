@@ -4,7 +4,8 @@ export const Product = z.object({
   productId: z.string(),
   name: z.string(),
   amount: z.number(),
-  // Price is sotred in cents in the datbase.
+  description: z.optional(z.string()),
+  // Price is stored in cents in the database.
   price: z
     .number()
     .int()
